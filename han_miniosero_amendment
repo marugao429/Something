@@ -24,6 +24,27 @@ namespace ReverceGame
 
         //-----------------------------------------------
 
+        public int Turn
+        {
+            set
+            {
+                turn = value;
+                turnchanged();
+            }
+            get { return turn; }
+        }
+
+        public void turnchanged()
+        {
+            if (turn % 2 == 0)
+            {
+                lblTurn.Text = "後手番";
+            }
+            else
+            {
+                lblTurn.Text = "先手番";
+            }
+        }
         /// <summary>
         /// When the player in his turn click any table button
         /// </summary>
@@ -85,7 +106,7 @@ namespace ReverceGame
             if (turn % 2 == 1 && arrNum[btn.TabIndex] == 0)
             {
                 //turnを増やす
-                turn += 1;
+                Turn += 1;
                 //押下ボタンの位置に対応したtabindexを、配列に代入する。
                 arrNum[btn.TabIndex] = 1;
                 //先手なので黒に変える。
@@ -181,7 +202,7 @@ namespace ReverceGame
 
             if (turn % 2 == 0 && arrNum[btn.TabIndex] == 0)
             {
-                turn += 1;
+                Turn += 1;
                 arrNum[btn.TabIndex] = 2;
                 btn.BackColor = Color.White;
 
@@ -260,7 +281,7 @@ namespace ReverceGame
         private void btnReset_Click(object sender, EventArgs e)
         {
             List<Button> listbutton = new List<Button>() { btn0, btn1, btn2, btn3, btn4 };
-            turn = 1;
+            Turn = 1;
             listmemory.Clear();
             lblWhitePoint.Text = "0";
             lblBlackPoint.Text = "0";
@@ -280,7 +301,7 @@ namespace ReverceGame
         /// <param name="e"></param>
         private void btnPass_Click(object sender, EventArgs e)
         {
-            turn += 1;
+            Turn+= 1;
         }
     }
 }
