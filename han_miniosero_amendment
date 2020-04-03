@@ -1,0 +1,275 @@
+//各ボタンの名称：プレー用ボタン＝btn0,btn1,btn2,btn3,btn4　※増やすことも可能、正しTabIndexもそれに応じて割り当てること。
+//黒と白の石数は各プレーボタンを押下時に処理。
+//btn0~btn4はイベントハンドラー（btnclick）に紐付。
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
+
+namespace ReverceGame
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        //----【変数の宣言】-------------------------------
+
+        int[] arrNum = { 0, 0, 0, 0, 0 };
+        int turn = 1;
+        List<int> listmemory = new List<int>();
+
+        //-----------------------------------------------
+
+        /// <summary>
+        /// When the player in his turn click any table button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>      
+        public void btnClick(object sender, EventArgs e)
+        {
+            //先手番の処理
+            sentePlay(sender as Button);
+            //後手番の処理
+            gotePlay(sender as Button);
+            
+　　　　　　　//黒の点数用変数
+            int BP = 0;
+            //白の点数用変数
+            int WP = 0;
+            
+　　　　　　　//ほんとはarrNumの中にある指定index(1)のcountみたいな書き方をしたかったがやり方がわからずループ処理で無理やり済ませた。
+       　　　//.ForEachメソッドでもいけるかもしれないけど思いつかなかった。
+            for (int C = 0; C < arrNum.Length; C++)
+            {
+                if (arrNum[C] == 1)
+                {
+                    BP += 1;
+                }
+                else if (arrNum[C] == 2)
+                {
+                    WP += 1;
+                }
+            }
+            lblBlackPoint.Text = BP.ToString();
+            lblWhitePoint.Text = WP.ToString();
+
+　　　　　　　//対局終了時（turn=6）の処理
+            if(turn == 6)
+            {
+                if (BP > WP)
+                {
+                    lblShowDialog.Text = "先手勝利";
+                }
+                else
+                {
+                    lblShowDialog.Text = "後手勝利";
+                }
+            }
+        }
+
+        /// <summary>
+        /// "sente move"
+        /// </summary>
+        /// <param name="btn"></param>
+        public void sentePlay(Button btn)
+        {
+        　　//↓この宣言も一回で上の方に書いて済ませたかったが、プロパティが参照できないのでやむを得ずそれぞれに置いた。
+          　//回避の仕方があるなら教えてほしい。
+            List<Button> listbutton = new List<Button>() { btn0, btn1, btn2, btn3, btn4 };
+　　　　　　
+      　　　//turnを２で割って余る時＝先手
+            if (turn % 2 == 1 && arrNum[btn.TabIndex] == 0)
+            {
+            　　//turnを増やす
+                turn += 1;
+                //押下ボタンの位置に対応したtabindexを、配列に代入する。
+                arrNum[btn.TabIndex] = 1;
+                //先手なので黒に変える。
+                btn.BackColor = Color.Black;
+
+　　　　　　　　 //押下されたボタンのtabindex値分左に一つずつループさせてその時のボタン位置に応じた配列の数字によってどうするか決める。
+                for (int s = 1; s <= btn.TabIndex; s++)
+                {
+                    if (btn.TabIndex == 0)
+                    {
+                        break;
+                    }
+
+                    if (arrNum[btn.TabIndex - 1] == 1)
+                    {
+                        break;
+                    }
+
+                    if (arrNum[btn.TabIndex - s] == 0)
+                    {
+                        break;
+                    }
+
+                    else if (arrNum[btn.TabIndex - s] == 2)
+                    {
+                        listmemory.Add(btn.TabIndex - s);
+                        continue;
+                    }
+
+                    if (arrNum[btn.TabIndex - s] == 1 && listmemory.Count != 0)
+                    {
+                        for (int sf = 0; sf < listmemory.Count; sf++)
+                        {
+                            listbutton[listmemory[sf]].BackColor = Color.Black;
+                            arrNum[listmemory[sf]] = 1;
+                        }
+                    }
+                }
+
+                listmemory.Clear();
+
+　　　　　　　　 //押下されたボタンの場所から今度は右にループ処理
+                for (int ss = 1; ss <= (arrNum.Length - 1) - btn.TabIndex; ss++)
+                {
+                    if (btn.TabIndex == 4)
+                    {
+                        return;
+                    }
+
+                    if (arrNum[btn.TabIndex + ss] == 0)
+                    {
+                        break;
+                    }
+
+                    else if (arrNum[btn.TabIndex + ss] == 2)
+                    {
+                        listmemory.Add(btn.TabIndex + ss);
+                        continue;
+                    }
+
+                    if (arrNum[btn.TabIndex + ss] == 1 && listmemory.Count != 0)
+                    {
+                        for (int sff = 0; sff < listmemory.Count; sff++)
+                        {
+                            listbutton[listmemory[sff]].BackColor = Color.Black;
+                            arrNum[listmemory[sff]] = 1;
+                        }
+                    }
+                }
+                listmemory.Clear();
+            }
+        }
+
+        /// <summary>
+        /// "gote"move
+        /// </summary>
+        /// <param name="btn"></param>
+        public void gotePlay(Button btn)
+        {
+        　　//基本的に先手と同じ。やる気になれば先手と後手を一つのメソッドにまとめられるが多分わかりにくくなるのであえて分けた。
+            List<Button> listbutton = new List<Button>() { btn0, btn1, btn2, btn3, btn4 };
+
+            if (turn % 2 == 0 && arrNum[btn.TabIndex] == 0)
+            {
+                turn += 1;
+                arrNum[btn.TabIndex] = 2;
+                btn.BackColor = Color.White;
+
+                for (int g = 1; g <= btn.TabIndex; g++)
+                {
+                    if (btn.TabIndex == 0)
+                    {
+                        break;
+                    }
+
+                    if (arrNum[btn.TabIndex - 1] == 2)
+                    {
+                        break;
+                    }
+
+                    if (arrNum[btn.TabIndex - g] == 0)
+                    {
+                        break;
+                    }
+
+                    else if (arrNum[btn.TabIndex - g] == 1)
+                    {
+                        listmemory.Add(btn.TabIndex - g);
+                        continue;
+                    }
+
+                    if (arrNum[btn.TabIndex - g] == 2 && listmemory.Count != 0)
+                    {
+                        for (int gf = 0; gf < listmemory.Count; gf++)
+                        {
+                            listbutton[listmemory[gf]].BackColor = Color.White;
+                            arrNum[listmemory[gf]] = 2;
+                        }
+                    }
+                }
+
+                listmemory.Clear();
+
+                for (int gg = 1; gg <= (arrNum.Length - 1) - btn.TabIndex; gg++)
+                {
+                    if (btn.TabIndex == 4)
+                    {
+                        return;
+                    }
+
+                    if (arrNum[btn.TabIndex + gg] == 0)
+                    {
+                        break;
+                    }
+
+                    else if (arrNum[btn.TabIndex + gg] == 1)
+                    {
+                        listmemory.Add(btn.TabIndex + gg);
+                        continue;
+
+                    }
+
+                    if (arrNum[btn.TabIndex + gg] == 2 && listmemory.Count != 0)
+                    {
+                        for (int gff = 0; gff < listmemory.Count; gff++)
+                        {
+                            listbutton[listmemory[gff]].BackColor = Color.White;
+                            arrNum[listmemory[gff]] = 2;
+                        }
+                    }
+                }
+                listmemory.Clear();
+            }
+        }
+
+        /// <summary>
+        /// When the RESET button is pushed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            List<Button> listbutton = new List<Button>() { btn0, btn1, btn2, btn3, btn4 };
+            turn = 1;
+            listmemory.Clear();
+            lblWhitePoint.Text = "0";
+            lblBlackPoint.Text = "0";
+            lblShowDialog.Text = "";
+
+            for (int r = 0; r < arrNum.Length; r++)
+            {
+                listbutton[r].BackColor = Color.Green;
+                arrNum[r] = 0;
+            }
+        }
+
+        /// <summary>
+        /// When the PASS button is pushed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPass_Click(object sender, EventArgs e)
+        {
+            turn += 1;
+        }
+    }
+}
