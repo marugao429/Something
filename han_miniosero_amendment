@@ -35,14 +35,14 @@ namespace ReverceGame
             sentePlay(sender as Button);
             //後手番の処理
             gotePlay(sender as Button);
-            
-　　　　　　　//黒の点数用変数
+
+            //黒の点数用変数
             int BP = 0;
             //白の点数用変数
             int WP = 0;
-            
-　　　　　　　//ほんとはarrNumの中にある指定index(1)のcountみたいな書き方をしたかったがやり方がわからずループ処理で無理やり済ませた。
-       　　　//.ForEachメソッドでもいけるかもしれないけど思いつかなかった。
+
+            //ほんとはarrNumの中にある指定index(1)のcountみたいな書き方をしたかったがやり方がわからずループ処理で無理やり済ませた。
+            //.ForEachメソッドでもいけるかもしれないけど思いつかなかった。
             for (int C = 0; C < arrNum.Length; C++)
             {
                 if (arrNum[C] == 1)
@@ -57,8 +57,8 @@ namespace ReverceGame
             lblBlackPoint.Text = BP.ToString();
             lblWhitePoint.Text = WP.ToString();
 
-　　　　　　　//対局終了時（turn=6）の処理
-            if(turn == 6)
+            //対局終了時（turn=6）の処理
+            if (turn == 6)
             {
                 if (BP > WP)
                 {
@@ -77,49 +77,60 @@ namespace ReverceGame
         /// <param name="btn"></param>
         public void sentePlay(Button btn)
         {
-        　　//↓この宣言も一回で上の方に書いて済ませたかったが、プロパティが参照できないのでやむを得ずそれぞれに置いた。
-          　//回避の仕方があるなら教えてほしい。
+            //↓この宣言も一回で上の方に書いて済ませたかったが、プロパティが参照できないのでやむを得ずそれぞれに置いた。
+            //回避の仕方があるなら教えてほしい。
             List<Button> listbutton = new List<Button>() { btn0, btn1, btn2, btn3, btn4 };
-　　　　　　
-      　　　//turnを２で割って余る時＝先手
+
+            //turnを２で割って余る時＝先手
             if (turn % 2 == 1 && arrNum[btn.TabIndex] == 0)
             {
-            　　//turnを増やす
+                //turnを増やす
                 turn += 1;
                 //押下ボタンの位置に対応したtabindexを、配列に代入する。
                 arrNum[btn.TabIndex] = 1;
                 //先手なので黒に変える。
                 btn.BackColor = Color.Black;
 
-　　　　　　　　 //押下されたボタンのtabindex値分左に一つずつループさせてその時のボタン位置に応じた配列の数字によってどうするか決める。
+                //押下されたボタンのtabindex値分左に一つずつループさせてその時のボタン位置に応じた配列の数字によってどうするか決める。
                 for (int s = 1; s <= btn.TabIndex; s++)
                 {
+                    //※押下ボタンから左側を見る処理※
+                    //押下ボタンが０だった場合は左に何もないのでbreakさせる。
                     if (btn.TabIndex == 0)
                     {
                         break;
                     }
 
+                    //押下ボタンの一つ左が同じ色の場合は処理しないのでbreakさせる。
                     if (arrNum[btn.TabIndex - 1] == 1)
                     {
                         break;
                     }
 
+                    //押下ボタンからs(ループ回数）分左のマスの状態を見る処理
+                    //初期状態のボタンのところに差し掛かったら処理終了なのでbreak。
                     if (arrNum[btn.TabIndex - s] == 0)
                     {
                         break;
                     }
 
+                    //押下ボタンから左に見た時に、白だった場合、最後にひっくり返す処理をしなければいけないが、
+                    //２連続以上続くことも考えらるのでListを作ってその場所（＝tabindex)を記録させる処理。
                     else if (arrNum[btn.TabIndex - s] == 2)
                     {
                         listmemory.Add(btn.TabIndex - s);
                         continue;
                     }
 
+                    //この処理までくるということは、左隣が緑（初期）でも自分の色でもない場合、
+                    //↓かつ相手の色の踏んでいてlistmemoryに値が入っている状態で自分の色を踏んだ場合（＝ひっくり返す）の処理。
                     if (arrNum[btn.TabIndex - s] == 1 && listmemory.Count != 0)
                     {
+                        //↓listmemoryの中にあるものが複数ある場合、一気に処理できないので、入っているものの分ループ処理で色替え。
                         for (int sf = 0; sf < listmemory.Count; sf++)
                         {
                             listbutton[listmemory[sf]].BackColor = Color.Black;
+                            //ひっくり返した後でひっくり返した場所の
                             arrNum[listmemory[sf]] = 1;
                         }
                     }
@@ -127,7 +138,7 @@ namespace ReverceGame
 
                 listmemory.Clear();
 
-　　　　　　　　 //押下されたボタンの場所から今度は右にループ処理
+                //押下されたボタンの場所から今度は右にループ処理
                 for (int ss = 1; ss <= (arrNum.Length - 1) - btn.TabIndex; ss++)
                 {
                     if (btn.TabIndex == 4)
@@ -165,7 +176,7 @@ namespace ReverceGame
         /// <param name="btn"></param>
         public void gotePlay(Button btn)
         {
-        　　//基本的に先手と同じ。やる気になれば先手と後手を一つのメソッドにまとめられるが多分わかりにくくなるのであえて分けた。
+            //基本的に先手と同じ。やる気になれば先手と後手を一つのメソッドにまとめられるが多分わかりにくくなるのであえて分けた。
             List<Button> listbutton = new List<Button>() { btn0, btn1, btn2, btn3, btn4 };
 
             if (turn % 2 == 0 && arrNum[btn.TabIndex] == 0)
