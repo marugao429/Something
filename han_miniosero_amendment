@@ -24,16 +24,20 @@ namespace ReverceGame
 
         //-----------------------------------------------
 
+        //プロパティ　getter setter
         public int Turn
         {
             set
             {
                 turn = value;
+                //値が入ってきたときに↓のメソッドを呼び出す
                 turnchanged();
             }
             get { return turn; }
         }
 
+        //手番表示を自動するためだけに作られた贅沢なメソッド。
+        //もっとスマートなやり方ないもんかね。
         public void turnchanged()
         {
             if (turn % 2 == 0)
@@ -45,6 +49,7 @@ namespace ReverceGame
                 lblTurn.Text = "先手番";
             }
         }
+
         /// <summary>
         /// When the player in his turn click any table button
         /// </summary>
